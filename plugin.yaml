@@ -1,0 +1,12 @@
+name: hermes-ninerouter-quota
+manifest_version: 1
+version: 0.1.0
+description: "Show 9router provider quotas (Codex, Claude, ...) in the desktop status bar."
+author: b2un0
+homepage: https://github.com/b2un0/hermes-ninerouter-quota
+license: MIT
+kind: standalone
+platforms:
+  - linux
+  - macos
+  - windows

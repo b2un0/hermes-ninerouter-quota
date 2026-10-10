@@ -1,0 +1,9 @@
+{
+  "name": "hermes-ninerouter-quota",
+  "label": "9router Quota",
+  "description": "9router provider quotas for the desktop status bar.",
+  "icon": "Gauge",
+  "version": "0.1.0",
+  "tab": { "path": "/ninerouter-quota", "hidden": true },
+  "api": "plugin_api.py"
+}
