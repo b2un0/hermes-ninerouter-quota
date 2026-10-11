@@ -5,6 +5,16 @@ const vm = require('node:vm')
 const source = fs.readFileSync(`${__dirname}/../desktop/plugin.js`, 'utf8')
 const logic = source.slice(source.indexOf('const pctOf'), source.indexOf('function fmtReset'))
 const lowest = vm.runInNewContext(`${logic}\nlowest`)
+const resetLogic = source.slice(source.indexOf('function fmtReset'), source.indexOf('// color by remaining'))
+const resetBubble = vm.runInNewContext(`${resetLogic}\nresetBubble`)
+test('reset bubble is compact and hidden without resets', () => {
+  assert.equal(resetBubble(undefined), null)
+  assert.equal(resetBubble({ available: 0 }).text, '0↻')
+  assert.equal(resetBubble({ available: 2 }).text, '2↻')
+  assert.equal(resetBubble({ available: 2 }).active, true)
+  assert.equal(resetBubble({ available: 0 }).active, false)
+  assert.match(resetBubble({ available: 1, expiresAt: new Date(Date.now() + 3600e3).toISOString() }).title, /1 resets? available · expires \d/)
+})
 test('plugin registers only status bar contribution', () => {
   const registrations = []
   const plugin = vm.runInNewContext(source.slice(source.indexOf('export default')).replace('export default', '(') + ')', {

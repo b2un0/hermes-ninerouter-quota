@@ -46,6 +46,13 @@ function fmtReset(iso) {
   return `${Math.floor(h / 24)}d ${h % 24}h`
 }
 
+function resetBubble(resets) {
+  if (!resets) return null
+  const n = resets.available
+  const expires = n > 0 && resets.expiresAt ? ` · expires ${fmtReset(resets.expiresAt)}` : ''
+  return { text: `${n}↻`, active: n > 0, title: `${n} reset${n === 1 ? '' : 's'} available${expires}` }
+}
+
 // color by remaining %: theme vars only, via opacity-free tokens
 const tone = p => (p === null ? 'var(--ui-text-quaternary)' : p < 15 ? 'var(--destructive, #e5484d)' : p < 35 ? 'var(--ui-text-secondary)' : 'var(--ui-accent)')
 
@@ -83,6 +90,7 @@ async function setActive(it, active) {
 }
 
 function Account({ it }) {
+  const bubble = resetBubble(it.resets)
   return jsxs('div', {
     className: 'flex flex-col gap-1.5',
     children: [
@@ -93,6 +101,17 @@ function Account({ it }) {
           it.plan
             ? jsx('span', { className: 'shrink-0 text-[0.6875rem] font-normal text-(--ui-text-tertiary)', children: it.plan })
             : null,
+          bubble
+            ? jsx('span', {
+                title: bubble.title,
+                className: 'shrink-0 rounded-full px-1.5 text-[0.625rem] font-normal leading-4',
+                style: {
+                  background: 'var(--ui-stroke-secondary)',
+                  color: bubble.active ? 'var(--ui-accent)' : 'var(--ui-text-tertiary)'
+                },
+                children: bubble.text
+              })
+            : null,
           jsx('span', {
             className: 'flex h-6 w-9 shrink-0 items-center justify-end',
             children: jsx(Switch, { size: 'xs', checked: it.active, onCheckedChange: v => setActive(it, v) })
@@ -101,18 +120,6 @@ function Account({ it }) {
       }),
       it.error ? jsx('div', { className: 'text-[0.6875rem] text-(--ui-text-tertiary)', children: it.error }) : null,
       ...(it.quotas || []).map(q => jsx(Bar, { q }, q.name)),
-      it.resets
-        ? jsxs('div', {
-            className: 'flex justify-between text-[0.6875rem] text-(--ui-text-secondary)',
-            children: [
-              jsx('span', { children: 'resets available' }),
-              jsx('span', {
-                style: it.resets.available > 0 ? { color: 'var(--ui-accent)' } : undefined,
-                children: `${it.resets.available}${it.resets.available > 0 && it.resets.expiresAt ? ` · expires ${fmtReset(it.resets.expiresAt)}` : ''}`
-              })
-            ]
-          })
-        : null,
       it.extra
         ? jsx(Bar, {
             q: {
