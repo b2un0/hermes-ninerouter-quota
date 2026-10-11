@@ -182,12 +182,6 @@ export default {
   register(ctx) {
     rest = ctx.rest
     ctx.register({ id: 'chip', area: 'statusBar.right', order: 125, render: () => jsx(Chip, {}) })
-    ctx.register({
-      id: 'pane',
-      area: 'panes',
-      title: '9router',
-      data: { placement: 'right', width: '320px' },
-      render: () => jsx(Body, {})
-    })
+
   }
 }

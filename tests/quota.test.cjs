@@ -5,6 +5,14 @@ const vm = require('node:vm')
 const source = fs.readFileSync(`${__dirname}/../desktop/plugin.js`, 'utf8')
 const logic = source.slice(source.indexOf('const pctOf'), source.indexOf('function fmtReset'))
 const lowest = vm.runInNewContext(`${logic}\nlowest`)
+test('plugin registers only status bar contribution', () => {
+  const registrations = []
+  const plugin = vm.runInNewContext(source.slice(source.indexOf('export default')).replace('export default', '(') + ')', {
+    ID: 'test', rest: null, jsx: () => {}, Chip: () => {}, Body: () => {}
+  })
+  plugin.register({ rest: () => {}, register: entry => registrations.push(entry) })
+  assert.deepEqual(registrations.map(entry => entry.area), ['statusBar.right'])
+})
 const account = (...values) => ({ active: true, quotas: values.map(remainingPct => ({ remainingPct })) })
 
 test('status bar uses remaining account instead of exhausted account', () => {
