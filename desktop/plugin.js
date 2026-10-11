@@ -19,14 +19,19 @@ const pctOf = q => (typeof q.remainingPct === 'number' ? q.remainingPct : null)
 
 function lowest(items) {
   let min = null
+  let exhausted = false
   for (const it of items || []) {
     if (!it.active) continue
-    for (const q of it.quotas || []) {
-      const p = pctOf(q)
-      if (p !== null && (min === null || p < min)) min = p
+    const values = (it.quotas || []).map(pctOf).filter(p => p !== null && Number.isFinite(p))
+    if (!values.length) continue
+    const remaining = Math.min(...values)
+    if (remaining <= 0) {
+      exhausted = true
+      continue
     }
+    if (min === null || remaining < min) min = remaining
   }
-  return min
+  return min ?? (exhausted ? 0 : null)
 }
 
 function fmtReset(iso) {
